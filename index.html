@@ -624,7 +624,7 @@ async function loadStats() {
     // Get all entries for this unit with their doc counts
     const entries = await sb(`logbook_entries?unit_owner=eq.${encodeURIComponent(session.unit)}&select=id,date_time_received,document_items(id)`);
     const allDocs = entries.flatMap(e => e.document_items);
-    const today = new Date().toISOString().slice(0,10);
+    const today = new Date().toLocaleDateString('en-PH', {year:'numeric', month:'2-digit', day:'2-digit'}).split('/').reverse().join('-');
     const todayCount = entries.filter(e => e.date_time_received.slice(0,10)===today).length;
     const depts = new Set(entries.map(e => e.department).filter(Boolean));
 
@@ -668,7 +668,7 @@ async function loadLogbook() {
 
     // Update stats
     document.getElementById('statTotal').textContent = entries.length;
-    const today = new Date().toISOString().slice(0,10);
+    const today = new Date().toLocaleDateString('en-PH', {year:'numeric', month:'2-digit', day:'2-digit'}).split('/').reverse().join('-');
     document.getElementById('statToday').textContent  = entries.filter(e=>e.date_time_received.slice(0,10)===today).length;
     document.getElementById('statDepts').textContent  = new Set(entries.map(e=>e.department)).size;
     document.getElementById('statDocs').textContent   = entries.reduce((s,e)=>s+e.document_items.length,0);
