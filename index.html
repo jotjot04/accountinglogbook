@@ -624,9 +624,12 @@ async function loadStats() {
     // Get all entries for this unit with their doc counts
     const entries = await sb(`logbook_entries?unit_owner=eq.${encodeURIComponent(session.unit)}&select=id,date_time_received,document_items(id)`);
     const allDocs = entries.flatMap(e => e.document_items);
-    const now = new Date();
-    const today = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
-    const todayCount = entries.filter(e => e.date_time_received.slice(0,10)===today).length;
+    const today = new Date().toLocaleDateString('en-CA', {timeZone:'Asia/Manila'});
+    const todayCount = entries.filter(e => {
+    const entryDate = new Date(e.date_time_received);
+    const entryPH = entryDate.toLocaleDateString('en-CA', {timeZone:'Asia/Manila'});
+    return entryPH === today;
+    }).length;
     const depts = new Set(entries.map(e => e.department).filter(Boolean));
 
     // Get full entries to count departments
@@ -669,8 +672,7 @@ async function loadLogbook() {
 
     // Update stats
     document.getElementById('statTotal').textContent = entries.length;
-    const now = new Date();
-    const today = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+    const today = new Date().toLocaleDateString('en-CA', {timeZone:'Asia/Manila'});
     document.getElementById('statToday').textContent  = entries.filter(e=>e.date_time_received.slice(0,10)===today).length;
     document.getElementById('statDepts').textContent  = new Set(entries.map(e=>e.department)).size;
     document.getElementById('statDocs').textContent   = entries.reduce((s,e)=>s+e.document_items.length,0);
